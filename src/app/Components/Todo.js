@@ -4,26 +4,24 @@ import { useState } from "react";
 import List from "./List";
 
 const Todo = () => {
-  const todos = [];
 
-  const [task, setTask] = useState("");
+  const [todos, setTodos] = useState([]);
+  const [input, setInput] = useState("")
   const [openModal, setOpenModal] = useState(false);
 
-  function addText() {
-    if (task !== null) {
-      const newTask = {
-        id: Date.now(),
-        text: task,
-        completed: false,
-      };
+  const addTodo = () => {
+    if (input.trim() === "") return;
+    setTodos([...todos, { id: Date.now(), text: input, done: false }]);
+    setInput("");
+    setOpenModal(false)
+  };
 
-      todos.push(newTask);
-    }
-  }
+  
   console.log(todos);
+  console.log(input);
 
   return (
-    <div className="w-full h-full">
+    <div className="w-full h-full xl:px-8 md:px-6 px-4 ">
       <div className="my-4 flex justify-center items-center gap-4">
         <h1 className=" text-3xl text-white">Today</h1>
         <h3 className="text-base text-white">1</h3>
@@ -43,8 +41,8 @@ const Todo = () => {
               <input
                 type="text"
                 id="task-input"
-                value={task}
-                onChange={(e) => setTask(e.target.value)}
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
                 placeholder="Enter a new task..."
                 className="w-full bg-white outline-none rounded-[16px] p-3"
               />
@@ -60,7 +58,7 @@ const Todo = () => {
                 <button
                   className="min-w-[122px] rounded-lg bg-blue-700 px-[10px] py-[6px] hover:bg-blue-500 focus:outline-none focus:ring-4
     focus:ring-blue-900 active:bg-blue-600"
-                  onClick={addText()}
+                  onClick={addTodo}
                 >
                   add
                 </button>
@@ -69,7 +67,11 @@ const Todo = () => {
           </div>
         </div>
       )}
-      <div></div>
+      <div className=" w-full flex flex-col gap-2.5">
+       {todos.length === 0 ? <div><h4 className="text-xl text-white">there is no todo like now</h4></div> : <div className="w-full border border-zinc-500">
+        {todos.map((todo)=><List key={todo.id} TODO={todo} />)}
+        </div>}
+      </div>
     </div>
   );
 };
