@@ -8,6 +8,9 @@ const Todo = () => {
   const [todos, setTodos] = useState([]);
   const [input, setInput] = useState("")
   const [openModal, setOpenModal] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  const [editInput, setEditInput] = useState("");
+
 
   const addTodo = () => {
     if (input.trim() === "") return;
@@ -15,6 +18,38 @@ const Todo = () => {
     setInput("");
     setOpenModal(false)
   };
+
+  function editTask(id, newInput) {
+  const editedTaskList = todos.map((todo) => {
+    // if this todo has the same ID as the edited todo
+    if (id === todo.id) {
+      // Copy the todo and update its name
+      return { ...todo, text: newInput };
+    }
+    // Return the original todo if it's not the edited todo
+    return todo;
+  });
+  setTodos(editedTaskList);
+}
+
+
+const startEditing = (todo) => {
+  setEditingId(todo.id);
+  setEditInput(todo.text);
+};
+
+const cancelEdit = () => {
+  setEditingId(null);
+  setEditInput("");
+};
+
+const saveEdit = (id) => {
+  if (editInput.trim()) {
+    editTask(id, editInput);
+    cancelEdit();
+  }
+};
+
 
   
   console.log(todos);
@@ -68,8 +103,22 @@ const Todo = () => {
         </div>
       )}
       <div className=" w-full flex flex-col gap-2.5">
-       {todos.length === 0 ? <div><h4 className="text-xl text-white">there is no todo like now</h4></div> : <div className="w-full border border-zinc-500">
-        {todos.map((todo)=><List key={todo.id} TODO={todo} />)}
+       {todos.length === 0 ? <div><h4 className="text-xl text-white">there is no todo like now</h4></div> 
+       : 
+       <div className="w-full border border-zinc-500 flex justify-between p-3 rounded-lg">
+        {todos.map((todo)=>
+        <List 
+        key={todo.id} 
+        TODO={todo} 
+        startEditing={startEditing}
+        input={input} 
+        editingId={editingId} 
+        setEditingId={editingId}
+        editInput={editInput} 
+        setEditInput={setEditInput}
+        saveEdit={saveEdit}
+        cancelEdit={cancelEdit}
+        />)}
         </div>}
       </div>
     </div>
