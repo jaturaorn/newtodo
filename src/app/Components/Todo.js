@@ -4,62 +4,75 @@ import { useState } from "react";
 import List from "./List";
 
 const Todo = () => {
-
   const [todos, setTodos] = useState([]);
-  const [input, setInput] = useState("")
+  const [input, setInput] = useState("");
   const [openModal, setOpenModal] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [editInput, setEditInput] = useState("");
-
+  const [searchTerm, setSearchTerm] = useState("");
 
   const addTodo = () => {
     if (input.trim() === "") return;
     setTodos([...todos, { id: Date.now(), text: input, done: false }]);
     setInput("");
-    setOpenModal(false)
+    setOpenModal(false);
   };
 
   function editTask(id, newInput) {
-  const editedTaskList = todos.map((todo) => {
-    // if this todo has the same ID as the edited todo
-    if (id === todo.id) {
-      // Copy the todo and update its name
-      return { ...todo, text: newInput };
-    }
-    // Return the original todo if it's not the edited todo
-    return todo;
-  });
-  setTodos(editedTaskList);
-}
-
-
-const startEditing = (todo) => {
-  setEditingId(todo.id);
-  setEditInput(todo.text);
-};
-
-const cancelEdit = () => {
-  setEditingId(null);
-  setEditInput("");
-};
-
-const saveEdit = (id) => {
-  if (editInput.trim()) {
-    editTask(id, editInput);
-    cancelEdit();
+    const editedTaskList = todos.map((todo) => {
+      // if this todo has the same ID as the edited todo
+      if (id === todo.id) {
+        // Copy the todo and update its name
+        return { ...todo, text: newInput };
+      }
+      // Return the original todo if it's not the edited todo
+      return todo;
+    });
+    setTodos(editedTaskList);
   }
-};
 
+  const startEditing = (todo) => {
+    setEditingId(todo.id);
+    setEditInput(todo.text);
+  };
 
-  
-  console.log(todos);
-  console.log(input);
+  const cancelEdit = () => {
+    setEditingId(null);
+    setEditInput("");
+  };
+
+  const saveEdit = (id) => {
+    if (editInput.trim()) {
+      editTask(id, editInput);
+      cancelEdit();
+    }
+  };
+
+  const toggleDone = (id) => {
+    const newTodos = todos.map((todo) =>
+      todo.id === id ? { ...todo, done: !todo.done } : todo
+    );
+    setTodos(newTodos);
+  };
+
+  const deleteTodo = (id) => {
+    const newTodos = todos.filter((todo) => todo.id !== id);
+    setTodos(newTodos);
+  };
+
+  // const handleSearch = (event) => {
+  //   setSearchTerm(event.target.value);
+  // };
+
+  // const filteredItems = items.filter((item) =>
+  //   item.name.toLowerCase().includes(searchTerm.toLowerCase())
+  // );
 
   return (
     <div className="w-full h-full xl:px-8 md:px-6 px-4 ">
-      <div className="my-4 flex justify-center items-center gap-4">
+      <div className="mb-4 pt-4 flex justify-center items-center gap-4">
         <h1 className=" text-3xl text-white">Today</h1>
-        <h3 className="text-base text-white">1</h3>
+        <h3 className="text-lg text-white">{todos.length}</h3>
       </div>
       <div className="my-2">
         <button
@@ -83,7 +96,7 @@ const saveEdit = (id) => {
               />
               <div className="flex justify-end gap-3">
                 <button
-                  className="rounded-lg border-[1px] border-blue-700 bg-transparent 
+                  className="min-w-[122px] rounded-lg border-[1px] border-blue-700 bg-transparent 
     px-[11px] py-[7px] text-blue-700
     hover:border-blue-500 hover:text-blue-500 active:border-blue-600
     active:text-blue-600"
@@ -103,23 +116,30 @@ const saveEdit = (id) => {
         </div>
       )}
       <div className=" w-full flex flex-col gap-2.5">
-       {todos.length === 0 ? <div><h4 className="text-xl text-white">there is no todo like now</h4></div> 
-       : 
-       <div className="w-full border border-zinc-500 flex justify-between p-3 rounded-lg">
-        {todos.map((todo)=>
-        <List 
-        key={todo.id} 
-        TODO={todo} 
-        startEditing={startEditing}
-        input={input} 
-        editingId={editingId} 
-        setEditingId={editingId}
-        editInput={editInput} 
-        setEditInput={setEditInput}
-        saveEdit={saveEdit}
-        cancelEdit={cancelEdit}
-        />)}
-        </div>}
+        {todos.length === 0 ? (
+          <div>
+            <h4 className="text-xl text-white">there is no todo like now</h4>
+          </div>
+        ) : (
+          <div className="w-full border border-zinc-500 flex flex-col justify-between p-3 rounded-lg gap-3">
+            {todos.map((todo) => (
+              <List
+                key={todo.id}
+                TODO={todo}
+                startEditing={startEditing}
+                input={input}
+                editingId={editingId}
+                setEditingId={editingId}
+                editInput={editInput}
+                setEditInput={setEditInput}
+                saveEdit={saveEdit}
+                cancelEdit={cancelEdit}
+                toggleDone={toggleDone}
+                deleteTodo={deleteTodo}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
