@@ -10,10 +10,13 @@ const Todo = () => {
   const [editingId, setEditingId] = useState(null);
   const [editInput, setEditInput] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
+  const [showDoneOnly, setShowDoneOnly] = useState(false);
 
   const addTodo = () => {
     if (input.trim() === "") return;
-    setTodos([...todos, { id: Date.now(), text: input, done: false }]);
+    const newTodos = [...todos, { id: Date.now(), text: input, done: false }];
+    setTodos(newTodos);
+    localStorage.setItem("todos", JSON.stringify(newTodos));
     setInput("");
     setOpenModal(false);
   };
@@ -60,13 +63,19 @@ const Todo = () => {
     setTodos(newTodos);
   };
 
-  // const handleSearch = (event) => {
-  //   setSearchTerm(event.target.value);
-  // };
+  const handleSearch = (event) => {
+    setSearchTerm(event.target.value);
+  };
 
-  // const filteredItems = items.filter((item) =>
-  //   item.name.toLowerCase().includes(searchTerm.toLowerCase())
-  // );
+  const filteredItems = todos.filter(
+    (todo) =>
+      (!showDoneOnly || todo.done) &&
+      todo.text.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  console.log(todos);
+
+  console.log(filteredItems);
 
   return (
     <div className="w-full h-full xl:px-8 md:px-6 px-4 ">
@@ -80,6 +89,22 @@ const Todo = () => {
           onClick={() => setOpenModal(true)}
         >
           + add new to do
+        </button>
+      </div>
+      <div className="my-2.5 flex justify-center gap-2 w-full">
+        <input
+          type="text"
+          id="task-input"
+          value={searchTerm}
+          onChange={handleSearch}
+          placeholder="Search for anything"
+          className=" bg-white outline-none rounded-[16px] p-3 w-md"
+        />
+        <button
+          onClick={() => setShowDoneOnly(!showDoneOnly)}
+          className="text-sm text-blue-400 rounded-lg border-[1px] border-yellow-700 p-3"
+        >
+          {showDoneOnly ? "Show All" : "Show Done Only"}
         </button>
       </div>
       {openModal && (
@@ -100,6 +125,7 @@ const Todo = () => {
     px-[11px] py-[7px] text-blue-700
     hover:border-blue-500 hover:text-blue-500 active:border-blue-600
     active:text-blue-600"
+                  onClick={() => setOpenModal(false)}
                 >
                   cancel
                 </button>
@@ -116,13 +142,15 @@ const Todo = () => {
         </div>
       )}
       <div className=" w-full flex flex-col gap-2.5">
-        {todos.length === 0 ? (
+        {filteredItems.length === 0 ? (
           <div>
-            <h4 className="text-xl text-white">there is no todo like now</h4>
+            <h4 className="text-xl text-white">
+              There is no todo matching your filter
+            </h4>
           </div>
         ) : (
-          <div className="w-full border border-zinc-500 flex flex-col justify-between p-3 rounded-lg gap-3">
-            {todos.map((todo) => (
+          <div className="w-full flex flex-col gap-3">
+            {filteredItems.map((todo) => (
               <List
                 key={todo.id}
                 TODO={todo}

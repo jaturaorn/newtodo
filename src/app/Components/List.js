@@ -12,7 +12,7 @@ const List = ({
   const isEditing = editingId === TODO.id;
 
   return (
-    <div className="flex w-full justify-between">
+    <div className="flex w-full justify-between border border-zinc-500 p-3 rounded-lg">
       {isEditing ? (
         <input
           type="text"
